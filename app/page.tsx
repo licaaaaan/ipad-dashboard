@@ -1,5 +1,6 @@
 'use client'
 import GlassTile from '@/components/ui/GlassTile'
+import ClockTile from '@/components/tiles/ClockTile'
 
 export default function DashboardPage() {
   return (
@@ -17,9 +18,7 @@ export default function DashboardPage() {
       </div>
 
       <div style={{ gridColumn: '3', gridRow: '1' }}>
-        <GlassTile gradient="from-amber-400 to-amber-600" className="h-full">
-          <p className="text-white/60 text-sm">Clock</p>
-        </GlassTile>
+        <ClockTile />
       </div>
 
       <div style={{ gridColumn: '1', gridRow: '2' }}>
