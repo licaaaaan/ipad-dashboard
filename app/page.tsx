@@ -2,6 +2,7 @@
 import GlassTile from '@/components/ui/GlassTile'
 import ClockTile from '@/components/tiles/ClockTile'
 import WeatherTile from '@/components/tiles/WeatherTile'
+import MusicTile from '@/components/tiles/MusicTile'
 
 export default function DashboardPage() {
   return (
@@ -27,9 +28,7 @@ export default function DashboardPage() {
       </div>
 
       <div style={{ gridColumn: '2 / 4', gridRow: '2' }}>
-        <GlassTile gradient="from-green-600 to-green-800" className="h-full">
-          <p className="text-white/60 text-sm">Music</p>
-        </GlassTile>
+        <MusicTile />
       </div>
     </main>
   )
