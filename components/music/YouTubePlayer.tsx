@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from 'react'
 
 declare global {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   interface Window { YT: any; onYouTubeIframeAPIReady: () => void }
 }
 
@@ -53,12 +54,15 @@ export default function YouTubePlayer({ videoUrl }: YouTubePlayerProps) {
       videoId: videoId ?? '',
       playerVars: { listType: listId ? 'playlist' : undefined, list: listId, autoplay: 0 },
       events: {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         onStateChange: (e: any) => setIsPlaying(e.data === window.YT.PlayerState.PLAYING),
       },
     })
   }, [apiReady, videoUrl])
 
-  function toggle() { isPlaying ? playerRef.current?.pauseVideo() : playerRef.current?.playVideo() }
+  function toggle() {
+    if (isPlaying) { playerRef.current?.pauseVideo() } else { playerRef.current?.playVideo() }
+  }
   function next() { playerRef.current?.nextVideo() }
   function prev() { playerRef.current?.previousVideo() }
 

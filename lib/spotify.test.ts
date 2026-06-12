@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, it, expect, vi } from 'vitest'
 import { refreshSpotifyToken, getNowPlaying } from './spotify'
 import type { OAuthToken } from '@/types'
@@ -17,6 +18,7 @@ describe('refreshSpotifyToken', () => {
 
   it('fetches new token when expired', async () => {
     const token = makeToken(-1000)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     global.fetch = vi.fn().mockResolvedValue({
       ok: true,
       json: async () => ({ access_token: 'new_access', expires_in: 3600 }),
@@ -28,6 +30,7 @@ describe('refreshSpotifyToken', () => {
 
 describe('getNowPlaying', () => {
   it('returns null when nothing is playing', async () => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     global.fetch = vi.fn().mockResolvedValue({ status: 204 }) as any
     const result = await getNowPlaying('token123')
     expect(result).toBeNull()
