@@ -1,0 +1,61 @@
+<h2>Dashboard Layout</h2>
+<p class="subtitle">How should the tiles be arranged on your iPad dashboard?</p>
+
+<div class="cards">
+
+  <div class="card" data-choice="a" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;grid-template-rows:auto auto auto;gap:6px;padding:12px;background:#0f172a;border-radius:8px;height:160px;">
+        <div style="background:#1e40af;border-radius:6px;grid-column:span 2;display:flex;align-items:center;justify-content:center;color:#93c5fd;font-size:11px;font-weight:600;">WEATHER</div>
+        <div style="background:#1e3a5f;border-radius:6px;display:flex;align-items:center;justify-content:center;color:#7dd3fc;font-size:10px;">DATE</div>
+        <div style="background:#14532d;border-radius:6px;display:flex;align-items:center;justify-content:center;color:#86efac;font-size:10px;">CALENDAR</div>
+        <div style="background:#14532d;border-radius:6px;display:flex;align-items:center;justify-content:center;color:#86efac;font-size:10px;">CALENDAR</div>
+        <div style="background:#1e293b;border-radius:6px;display:flex;align-items:center;justify-content:center;color:#cbd5e1;font-size:10px;">CLOCK</div>
+        <div style="background:#4c1d95;border-radius:6px;grid-column:span 2;display:flex;align-items:center;justify-content:center;color:#c4b5fd;font-size:10px;">SPOTIFY / YT MUSIC</div>
+        <div style="background:#1e293b;border-radius:6px;display:flex;align-items:center;justify-content:center;color:#cbd5e1;font-size:10px;">...</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>A — Bento Grid</h3>
+      <p>Asymmetric tiles of different sizes. Weather and music get more space. Modern, app-like feel.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="b" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div style="display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr 1fr;gap:6px;padding:12px;background:#0f172a;border-radius:8px;height:160px;">
+        <div style="background:#1e40af;border-radius:6px;display:flex;align-items:center;justify-content:center;color:#93c5fd;font-size:11px;font-weight:600;">WEATHER</div>
+        <div style="background:#1e293b;border-radius:6px;display:flex;align-items:center;justify-content:center;color:#cbd5e1;font-size:11px;font-weight:600;">CLOCK</div>
+        <div style="background:#14532d;border-radius:6px;display:flex;align-items:center;justify-content:center;color:#86efac;font-size:11px;font-weight:600;">CALENDAR</div>
+        <div style="background:#14532d;border-radius:6px;display:flex;align-items:center;justify-content:center;color:#86efac;font-size:11px;font-weight:600;">CALENDAR</div>
+        <div style="background:#4c1d95;border-radius:6px;display:flex;align-items:center;justify-content:center;color:#c4b5fd;font-size:11px;font-weight:600;">SPOTIFY</div>
+        <div style="background:#7f1d1d;border-radius:6px;display:flex;align-items:center;justify-content:center;color:#fca5a5;font-size:11px;font-weight:600;">YT MUSIC</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>B — Uniform Grid</h3>
+      <p>Equal-size tiles in a clean 2-column layout. Balanced, symmetric, easy to scan at a glance.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="c" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div style="display:flex;gap:6px;padding:12px;background:#0f172a;border-radius:8px;height:160px;">
+        <div style="display:flex;flex-direction:column;gap:6px;flex:1.2;">
+          <div style="background:#1e40af;border-radius:6px;flex:2;display:flex;align-items:center;justify-content:center;color:#93c5fd;font-size:11px;font-weight:600;">WEATHER</div>
+          <div style="background:#4c1d95;border-radius:6px;flex:1.5;display:flex;align-items:center;justify-content:center;color:#c4b5fd;font-size:10px;">MUSIC</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px;flex:1;">
+          <div style="background:#1e293b;border-radius:6px;flex:0.8;display:flex;align-items:center;justify-content:center;color:#cbd5e1;font-size:10px;">CLOCK</div>
+          <div style="background:#14532d;border-radius:6px;flex:1;display:flex;align-items:center;justify-content:center;color:#86efac;font-size:10px;">CAL 1</div>
+          <div style="background:#14532d;border-radius:6px;flex:1;display:flex;align-items:center;justify-content:center;color:#86efac;font-size:10px;">CAL 2</div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>C — Sidebar + Main</h3>
+      <p>Tall feature column left (weather + music), smaller utility tiles right (clock, calendars).</p>
+    </div>
+  </div>
+
+</div>

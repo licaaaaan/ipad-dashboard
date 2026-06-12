@@ -10,16 +10,20 @@ export async function POST(req: NextRequest) {
   const token = await decryptToken<OAuthToken>(sealed)
   if (!token) return NextResponse.json({ error: 'Invalid token' }, { status: 401 })
 
-  const { action } = await req.json() as { action: 'play' | 'pause' | 'next' | 'previous' }
-  const refreshed = await refreshSpotifyToken(token)
-  await controlPlayback(refreshed.access_token, action)
+  try {
+    const { action } = await req.json() as { action: 'play' | 'pause' | 'next' | 'previous' }
+    const refreshed = await refreshSpotifyToken(token)
+    await controlPlayback(refreshed.access_token, action)
 
-  const res = NextResponse.json({ ok: true })
-  if (refreshed.access_token !== token.access_token) {
-    res.cookies.set('spotify_token', await encryptToken(refreshed), {
-      httpOnly: true, secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax', maxAge: 60 * 60 * 24 * 30, path: '/',
-    })
+    const res = NextResponse.json({ ok: true })
+    if (refreshed.access_token !== token.access_token) {
+      res.cookies.set('spotify_token', await encryptToken(refreshed), {
+        httpOnly: true, secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax', maxAge: 60 * 60 * 24 * 30, path: '/',
+      })
+    }
+    return res
+  } catch {
+    return NextResponse.json({ error: 'Playback control failed' }, { status: 500 })
   }
-  return res
 }

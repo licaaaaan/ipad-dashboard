@@ -55,8 +55,11 @@ export async function controlPlayback(
     previous: { method: 'POST', path: '/me/player/previous' },
   }
   const { method, path } = endpoints[action]
-  await fetch(`https://api.spotify.com/v1${path}`, {
+  const res = await fetch(`https://api.spotify.com/v1${path}`, {
     method,
     headers: { Authorization: `Bearer ${accessToken}` },
   })
+  if (!res.ok && res.status !== 204) {
+    throw new Error(`Spotify control error: ${res.status}`)
+  }
 }
