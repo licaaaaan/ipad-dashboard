@@ -1,6 +1,7 @@
 'use client'
 import GlassTile from '@/components/ui/GlassTile'
 import ClockTile from '@/components/tiles/ClockTile'
+import WeatherTile from '@/components/tiles/WeatherTile'
 
 export default function DashboardPage() {
   return (
@@ -12,9 +13,7 @@ export default function DashboardPage() {
       }}
     >
       <div style={{ gridColumn: '1 / 3', gridRow: '1' }}>
-        <GlassTile gradient="from-purple-700 to-cyan-500" className="h-full">
-          <p className="text-white/60 text-sm">Weather</p>
-        </GlassTile>
+        <WeatherTile />
       </div>
 
       <div style={{ gridColumn: '3', gridRow: '1' }}>
