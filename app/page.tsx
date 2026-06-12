@@ -1,17 +1,17 @@
 'use client'
+import { useState } from 'react'
 import GlassTile from '@/components/ui/GlassTile'
 import ClockTile from '@/components/tiles/ClockTile'
 import WeatherTile from '@/components/tiles/WeatherTile'
 import MusicTile from '@/components/tiles/MusicTile'
 
 export default function DashboardPage() {
+  const [youtubeUrl, setYoutubeUrl] = useState<string | null>(null)
+
   return (
     <main
       className="aurora-bg w-screen h-screen p-4 grid gap-3"
-      style={{
-        gridTemplateColumns: '2fr 1fr 1fr',
-        gridTemplateRows: '1fr 1fr',
-      }}
+      style={{ gridTemplateColumns: '2fr 1fr 1fr', gridTemplateRows: '1fr 1fr' }}
     >
       <div style={{ gridColumn: '1 / 3', gridRow: '1' }}>
         <WeatherTile />
@@ -28,7 +28,7 @@ export default function DashboardPage() {
       </div>
 
       <div style={{ gridColumn: '2 / 4', gridRow: '2' }}>
-        <MusicTile />
+        <MusicTile youtubeUrl={youtubeUrl} />
       </div>
     </main>
   )
