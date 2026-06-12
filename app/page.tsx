@@ -1,8 +1,8 @@
 'use client'
 import { useState } from 'react'
-import GlassTile from '@/components/ui/GlassTile'
 import ClockTile from '@/components/tiles/ClockTile'
 import WeatherTile from '@/components/tiles/WeatherTile'
+import CalendarTile from '@/components/tiles/CalendarTile'
 import MusicTile from '@/components/tiles/MusicTile'
 
 export default function DashboardPage() {
@@ -22,9 +22,7 @@ export default function DashboardPage() {
       </div>
 
       <div style={{ gridColumn: '1', gridRow: '2' }}>
-        <GlassTile gradient="from-emerald-500 to-teal-600" className="h-full">
-          <p className="text-white/60 text-sm">Calendar</p>
-        </GlassTile>
+        <CalendarTile />
       </div>
 
       <div style={{ gridColumn: '2 / 4', gridRow: '2' }}>
