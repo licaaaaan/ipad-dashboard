@@ -3,10 +3,10 @@ import { fetchWeather } from '@/lib/weather'
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url)
-  const lat = parseFloat(searchParams.get('lat') ?? '0')
-  const lon = parseFloat(searchParams.get('lon') ?? '0')
+  const lat = parseFloat(searchParams.get('lat') ?? 'NaN')
+  const lon = parseFloat(searchParams.get('lon') ?? 'NaN')
 
-  if (!lat || !lon) {
+  if (isNaN(lat) || isNaN(lon)) {
     return NextResponse.json({ error: 'lat and lon required' }, { status: 400 })
   }
 
