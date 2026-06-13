@@ -71,12 +71,12 @@ function parseLRC(lrc: string): LyricLine[] {
 async function fetchLyrics(np: NowPlaying): Promise<LyricLine[] | null> {
   try {
     const params = new URLSearchParams({
-      artist_name: np.artistName,
-      track_name: np.trackName,
-      album_name: np.albumName,
+      artist:   np.artistName,
+      title:    np.trackName,
+      album:    np.albumName,
       duration: String(Math.round(np.durationMs / 1000)),
     })
-    const res = await fetch(`https://lrclib.net/api/get?${params}`)
+    const res = await fetch(`/api/spotify/lyrics?${params}`)
     if (!res.ok) return null
     const data = await res.json()
     if (data.syncedLyrics) return parseLRC(data.syncedLyrics)
