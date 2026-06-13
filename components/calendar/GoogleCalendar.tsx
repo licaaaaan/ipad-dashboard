@@ -8,7 +8,6 @@ function dayLabel(dateStr: string): string {
 }
 
 function dayKey(dateStr: string): string {
-  // Returns YYYY-MM-DD regardless of whether dateStr is a date or datetime
   return dateStr.slice(0, 10)
 }
 
@@ -52,9 +51,9 @@ export default function GoogleCalendar() {
   if (!state.connected) {
     return (
       <div className="flex flex-col items-center justify-center h-full gap-3">
-        <p className="text-white/50 text-xs">Google Calendar</p>
+        <p className="text-white/50 text-xl">Google Calendar</p>
         <a href="/api/auth/google"
-          className="px-3 py-1.5 bg-emerald-500 hover:bg-emerald-400 text-white text-xs font-semibold rounded-full transition-colors">
+          className="px-4 py-2 bg-emerald-500 hover:bg-emerald-400 text-white text-lg font-semibold rounded-full transition-colors">
           Connect Google
         </a>
       </div>
@@ -66,27 +65,27 @@ export default function GoogleCalendar() {
   if (groups.length === 0) {
     return (
       <div className="flex flex-col h-full gap-1">
-        <p className="text-emerald-200/60 text-xs font-semibold tracking-widest uppercase mb-1">This Week</p>
+        <p className="text-emerald-200/60 text-lg font-semibold tracking-widest uppercase mb-1">This Week</p>
         <div className="flex items-center justify-center flex-1">
-          <p className="text-white/40 text-xs">No events this week</p>
+          <p className="text-white/40 text-xl">No events this week</p>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="flex flex-col gap-2.5 h-full overflow-y-auto no-scrollbar">
-      <p className="text-emerald-200/60 text-xs font-semibold tracking-widest uppercase shrink-0">This Week</p>
+    <div className="flex flex-col gap-3 h-full overflow-y-auto no-scrollbar">
+      <p className="text-emerald-200/60 text-lg font-semibold tracking-widest uppercase shrink-0">This Week</p>
       {groups.map(group => (
         <div key={group.key} className="shrink-0">
-          <p className="text-emerald-300/80 text-xs font-semibold mb-1">{group.label}</p>
-          <div className="flex flex-col gap-1 pl-1">
+          <p className="text-emerald-300/80 text-lg font-semibold mb-1.5">{group.label}</p>
+          <div className="flex flex-col gap-1.5 pl-1">
             {group.events.map(event => (
-              <div key={event.id} className="flex gap-2 items-baseline">
-                <span className="text-white/50 text-xs shrink-0 w-14">{formatTime(event)}</span>
-                <span className="text-white text-xs truncate flex-1">{event.title}</span>
+              <div key={event.id} className="flex gap-3 items-baseline">
+                <span className="text-white/50 text-base shrink-0 w-20">{formatTime(event)}</span>
+                <span className="text-white text-base truncate flex-1">{event.title}</span>
                 {event.calendarName && (
-                  <span className="text-white/30 text-xs shrink-0 truncate max-w-[60px]">{event.calendarName}</span>
+                  <span className="text-white/30 text-sm shrink-0 truncate max-w-[80px]">{event.calendarName}</span>
                 )}
               </div>
             ))}

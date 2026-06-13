@@ -6,28 +6,28 @@ import type { NowPlaying } from '@/types'
 
 function IconPrev() {
   return (
-    <svg viewBox="0 0 24 24" fill="currentColor" className="w-8 h-8">
+    <svg viewBox="0 0 24 24" fill="currentColor" className="w-10 h-10">
       <path d="M6 6h2v12H6zm3.5 6 8.5 6V6z" />
     </svg>
   )
 }
 function IconNext() {
   return (
-    <svg viewBox="0 0 24 24" fill="currentColor" className="w-8 h-8">
+    <svg viewBox="0 0 24 24" fill="currentColor" className="w-10 h-10">
       <path d="M6 18l8.5-6L6 6v12zm8.5-6v6h2V6h-2v6z" />
     </svg>
   )
 }
 function IconPlay() {
   return (
-    <svg viewBox="0 0 24 24" fill="currentColor" className="w-10 h-10">
+    <svg viewBox="0 0 24 24" fill="currentColor" className="w-14 h-14">
       <path d="M8 5v14l11-7z" />
     </svg>
   )
 }
 function IconPause() {
   return (
-    <svg viewBox="0 0 24 24" fill="currentColor" className="w-10 h-10">
+    <svg viewBox="0 0 24 24" fill="currentColor" className="w-14 h-14">
       <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
     </svg>
   )
@@ -42,7 +42,7 @@ function CtrlBtn({ onClick, children, large = false }: {
     <button
       onClick={onClick}
       className={`
-        ${large ? 'w-20 h-20' : 'w-14 h-14'}
+        ${large ? 'w-24 h-24' : 'w-16 h-16'}
         rounded-full bg-white/10 hover:bg-white/20 active:bg-white/30 active:scale-90
         flex items-center justify-center text-white transition-all duration-100 select-none
       `}
@@ -79,7 +79,6 @@ async function fetchLyrics(np: NowPlaying): Promise<LyricLine[] | null> {
     const res = await fetch(`/api/spotify/lyrics?${params}`)
     if (!res.ok) return null
     const data = await res.json()
-    // Only use synced lyrics — plain lyrics have no timestamps so 3-line display is meaningless
     if (data.syncedLyrics) return parseLRC(data.syncedLyrics)
     return null
   } catch {
@@ -94,14 +93,14 @@ function LyricsDisplay({ lines, positionMs }: { lines: LyricLine[]; positionMs: 
   const next = lines[activeIdx + 1]?.text ?? null
 
   return (
-    <div className="flex flex-col items-center gap-1.5 py-1 px-3">
-      <p className={`text-center text-xs leading-snug transition-all duration-300 ${prev ? 'text-white/30' : 'invisible'}`}>
+    <div className="flex flex-col items-center gap-2 py-1 px-3">
+      <p className={`text-center text-base leading-snug transition-all duration-300 ${prev ? 'text-white/30' : 'invisible'}`}>
         {prev ?? '​'}
       </p>
-      <p className="text-center text-sm font-semibold text-white leading-snug transition-all duration-300">
+      <p className="text-center text-xl font-semibold text-white leading-snug transition-all duration-300">
         {curr}
       </p>
-      <p className={`text-center text-xs leading-snug transition-all duration-300 ${next ? 'text-white/40' : 'invisible'}`}>
+      <p className={`text-center text-base leading-snug transition-all duration-300 ${next ? 'text-white/40' : 'invisible'}`}>
         {next ?? '​'}
       </p>
     </div>
@@ -115,7 +114,6 @@ export default function SpotifyPlayer() {
     connected: false, nowPlaying: null,
   })
   const [position, setPosition] = useState(0)
-  // undefined = loading, null = not found, LyricLine[] = found
   const [lyrics, setLyrics] = useState<LyricLine[] | null | undefined>(undefined)
   const positionRef = useRef(0)
 
@@ -137,7 +135,6 @@ export default function SpotifyPlayer() {
     return () => clearInterval(id)
   }, [poll])
 
-  // Progress ticker
   useEffect(() => {
     if (!state.nowPlaying?.isPlaying) return
     const id = setInterval(() => {
@@ -147,7 +144,6 @@ export default function SpotifyPlayer() {
     return () => clearInterval(id)
   }, [state.nowPlaying?.isPlaying, state.nowPlaying?.trackName])
 
-  // Fetch lyrics when track changes
   const np = state.nowPlaying
   const trackKey = np ? `${np.artistName}|${np.trackName}` : null
   useEffect(() => {
@@ -169,9 +165,9 @@ export default function SpotifyPlayer() {
   if (!state.connected) {
     return (
       <div className="flex flex-col items-center justify-center h-full gap-4">
-        <p className="text-white/50 text-sm text-center">Spotify not connected</p>
+        <p className="text-white/50 text-xl text-center">Spotify not connected</p>
         <a href="/api/auth/spotify"
-          className="px-5 py-2.5 bg-green-500 hover:bg-green-400 text-white text-sm font-semibold rounded-full transition-colors">
+          className="px-6 py-3 bg-green-500 hover:bg-green-400 text-white text-lg font-semibold rounded-full transition-colors">
           Connect Spotify
         </a>
       </div>
@@ -181,33 +177,33 @@ export default function SpotifyPlayer() {
   const progress = np ? Math.min((position / np.durationMs) * 100, 100) : 0
 
   return (
-    <div className="flex flex-col h-full items-center gap-3 pt-2">
-      {/* Album art */}
-      <div className="shrink-0">
+    <div className="flex flex-col h-full gap-3">
+      {/* Album art — fills full tile width */}
+      <div className="shrink-0 w-full">
         {np?.albumArtUrl ? (
           <img src={np.albumArtUrl} alt={np.albumName}
-            className="w-48 h-48 rounded-2xl shadow-2xl object-cover" />
+            className="w-full aspect-square rounded-2xl shadow-2xl object-cover" />
         ) : (
-          <div className="w-48 h-48 rounded-2xl bg-white/5 flex items-center justify-center">
-            <span className="text-5xl">🎵</span>
+          <div className="w-full aspect-square rounded-2xl bg-white/5 flex items-center justify-center">
+            <span className="text-6xl">🎵</span>
           </div>
         )}
       </div>
 
       {/* Track info */}
-      <div className="shrink-0 text-center w-full px-2">
+      <div className="shrink-0 text-center w-full px-1">
         {np ? (
           <>
-            <p className="text-white font-semibold text-base truncate">{np.trackName}</p>
-            <p className="text-white/60 text-sm truncate">{np.artistName}</p>
+            <p className="text-white font-semibold text-2xl truncate">{np.trackName}</p>
+            <p className="text-white/60 text-xl truncate">{np.artistName}</p>
           </>
         ) : (
-          <p className="text-white/40 text-sm">Nothing playing</p>
+          <p className="text-white/40 text-xl">Nothing playing</p>
         )}
       </div>
 
       {/* Progress bar */}
-      <div className="shrink-0 w-full h-1.5 bg-white/20 rounded-full overflow-hidden">
+      <div className="shrink-0 w-full h-2 bg-white/20 rounded-full overflow-hidden">
         <div className="h-full bg-green-400 rounded-full transition-all duration-1000"
           style={{ width: `${progress}%` }} />
       </div>
@@ -221,13 +217,13 @@ export default function SpotifyPlayer() {
         <CtrlBtn onClick={() => control('next')}><IconNext /></CtrlBtn>
       </div>
 
-      {/* Lyrics — 3-line display below controls */}
+      {/* Lyrics */}
       <div className="shrink-0 w-full border-t border-white/10 pt-2">
         {lyrics === undefined && np && (
-          <p className="text-center text-white/25 text-xs">Loading lyrics…</p>
+          <p className="text-center text-white/25 text-base">Loading lyrics…</p>
         )}
         {lyrics === null && np && (
-          <p className="text-center text-white/20 text-xs">No lyrics available</p>
+          <p className="text-center text-white/20 text-base">No lyrics available</p>
         )}
         {lyrics && lyrics.length > 0 && (
           <LyricsDisplay lines={lyrics} positionMs={position} />

@@ -51,10 +51,10 @@ export default function ClockWeatherTile({ locationOverride }: { locationOverrid
       {/* Time + Date */}
       <div className="flex items-start justify-between">
         <div>
-          <span className="text-5xl font-light text-white tabular-nums tracking-tight">
+          <span className="text-7xl font-light text-white tabular-nums tracking-tight">
             {now ? formatTime(now) : '--:--:--'}
           </span>
-          <p className="text-amber-100/70 text-sm font-medium mt-1">
+          <p className="text-amber-100/70 text-xl font-medium mt-2">
             {now ? formatDate(now) : ''}
           </p>
         </div>
@@ -62,25 +62,25 @@ export default function ClockWeatherTile({ locationOverride }: { locationOverrid
         {/* Current weather */}
         {weather && (
           <div className="flex flex-col items-end gap-1">
-            <div className="flex items-center gap-2">
-              <span className="text-white text-4xl font-light">{weather.temp}°</span>
-              <span className="text-4xl" role="img" aria-label={weather.condition}>{weather.icon}</span>
+            <div className="flex items-center gap-3">
+              <span className="text-white text-6xl font-light">{weather.temp}°</span>
+              <span className="text-6xl" role="img" aria-label={weather.condition}>{weather.icon}</span>
             </div>
-            <p className="text-purple-100/70 text-xs capitalize text-right">{weather.condition}</p>
-            <p className="text-purple-100/90 text-sm text-right font-medium">📍 {weather.city}</p>
+            <p className="text-purple-100/70 text-lg capitalize text-right">{weather.condition}</p>
+            <p className="text-purple-100/90 text-xl text-right font-medium">📍 {weather.city}</p>
           </div>
         )}
       </div>
 
       {/* Forecast */}
       {weather && (
-        <div className="flex gap-4">
+        <div className="flex gap-6">
           {weather.forecast.map((day) => (
             <div key={day.date} className="flex flex-col items-center gap-1">
-              <span className="text-purple-200/60 text-xs">{day.date}</span>
-              <span className="text-xl" role="img" aria-label="">{day.icon}</span>
-              <span className="text-white text-xs">{day.high}°</span>
-              <span className="text-purple-200/50 text-xs">{day.low}°</span>
+              <span className="text-purple-200/60 text-lg">{day.date}</span>
+              <span className="text-3xl" role="img" aria-label="">{day.icon}</span>
+              <span className="text-white text-lg">{day.high}°</span>
+              <span className="text-purple-200/50 text-base">{day.low}°</span>
             </div>
           ))}
         </div>
