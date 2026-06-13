@@ -67,7 +67,7 @@ export default function ClockWeatherTile({ locationOverride }: { locationOverrid
               <span className="text-4xl" role="img" aria-label={weather.condition}>{weather.icon}</span>
             </div>
             <p className="text-purple-100/70 text-xs capitalize text-right">{weather.condition}</p>
-            <p className="text-purple-200/50 text-xs text-right">{weather.city}</p>
+            <p className="text-purple-100/90 text-sm text-right font-medium">📍 {weather.city}</p>
           </div>
         )}
       </div>

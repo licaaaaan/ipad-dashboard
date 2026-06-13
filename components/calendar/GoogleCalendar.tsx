@@ -2,9 +2,35 @@
 import { useEffect, useState, useCallback } from 'react'
 import type { CalendarEvent } from '@/types'
 
-function formatEventTime(event: CalendarEvent): string {
+function dayLabel(dateStr: string): string {
+  const d = new Date(dateStr)
+  return d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })
+}
+
+function dayKey(dateStr: string): string {
+  // Returns YYYY-MM-DD regardless of whether dateStr is a date or datetime
+  return dateStr.slice(0, 10)
+}
+
+function formatTime(event: CalendarEvent): string {
   if (event.allDay) return 'All day'
   return new Date(event.start).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })
+}
+
+function groupByDay(events: CalendarEvent[]): { key: string; label: string; events: CalendarEvent[] }[] {
+  const map = new Map<string, CalendarEvent[]>()
+  for (const e of events) {
+    const k = dayKey(e.start)
+    if (!map.has(k)) map.set(k, [])
+    map.get(k)!.push(e)
+  }
+  return Array.from(map.entries())
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([key, evts]) => ({
+      key,
+      label: dayLabel(evts[0].start),
+      events: evts,
+    }))
 }
 
 export default function GoogleCalendar() {
@@ -35,23 +61,36 @@ export default function GoogleCalendar() {
     )
   }
 
-  if (state.events.length === 0) {
+  const groups = groupByDay(state.events)
+
+  if (groups.length === 0) {
     return (
-      <div className="flex items-center justify-center h-full">
-        <p className="text-white/40 text-xs">No upcoming events</p>
+      <div className="flex flex-col h-full gap-1">
+        <p className="text-emerald-200/60 text-xs font-semibold tracking-widest uppercase mb-1">This Week</p>
+        <div className="flex items-center justify-center flex-1">
+          <p className="text-white/40 text-xs">No events this week</p>
+        </div>
       </div>
     )
   }
 
   return (
-    <div className="flex flex-col gap-2 h-full overflow-hidden">
-      <p className="text-emerald-200/60 text-xs font-semibold tracking-widest uppercase">Google</p>
-      {state.events.map((event) => (
-        <div key={event.id} className="flex gap-2 items-start">
-          <span className="text-emerald-300 text-xs font-medium w-16 shrink-0 mt-0.5">
-            {formatEventTime(event)}
-          </span>
-          <span className="text-white text-xs truncate">{event.title}</span>
+    <div className="flex flex-col gap-2.5 h-full overflow-y-auto no-scrollbar">
+      <p className="text-emerald-200/60 text-xs font-semibold tracking-widest uppercase shrink-0">This Week</p>
+      {groups.map(group => (
+        <div key={group.key} className="shrink-0">
+          <p className="text-emerald-300/80 text-xs font-semibold mb-1">{group.label}</p>
+          <div className="flex flex-col gap-1 pl-1">
+            {group.events.map(event => (
+              <div key={event.id} className="flex gap-2 items-baseline">
+                <span className="text-white/50 text-xs shrink-0 w-14">{formatTime(event)}</span>
+                <span className="text-white text-xs truncate flex-1">{event.title}</span>
+                {event.calendarName && (
+                  <span className="text-white/30 text-xs shrink-0 truncate max-w-[60px]">{event.calendarName}</span>
+                )}
+              </div>
+            ))}
+          </div>
         </div>
       ))}
     </div>

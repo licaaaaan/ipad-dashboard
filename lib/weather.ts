@@ -54,7 +54,8 @@ export async function fetchWeather({ lat, lon }: { lat: number; lon: number }): 
   let city = `${lat.toFixed(2)}, ${lon.toFixed(2)}`
   try {
     const geo = await fetch(
-      `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`
+      `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`,
+      { headers: { 'User-Agent': 'iPad-Dashboard/1.0 (https://i-pad-dashbooard.vercel.app)' } }
     )
     if (geo.ok) {
       const g = await geo.json()

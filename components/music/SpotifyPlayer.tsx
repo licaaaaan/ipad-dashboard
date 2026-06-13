@@ -6,28 +6,28 @@ import type { NowPlaying } from '@/types'
 
 function IconPrev() {
   return (
-    <svg viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
+    <svg viewBox="0 0 24 24" fill="currentColor" className="w-8 h-8">
       <path d="M6 6h2v12H6zm3.5 6 8.5 6V6z" />
     </svg>
   )
 }
 function IconNext() {
   return (
-    <svg viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
+    <svg viewBox="0 0 24 24" fill="currentColor" className="w-8 h-8">
       <path d="M6 18l8.5-6L6 6v12zm8.5-6v6h2V6h-2v6z" />
     </svg>
   )
 }
 function IconPlay() {
   return (
-    <svg viewBox="0 0 24 24" fill="currentColor" className="w-8 h-8">
+    <svg viewBox="0 0 24 24" fill="currentColor" className="w-10 h-10">
       <path d="M8 5v14l11-7z" />
     </svg>
   )
 }
 function IconPause() {
   return (
-    <svg viewBox="0 0 24 24" fill="currentColor" className="w-8 h-8">
+    <svg viewBox="0 0 24 24" fill="currentColor" className="w-10 h-10">
       <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
     </svg>
   )
@@ -42,7 +42,7 @@ function CtrlBtn({ onClick, children, large = false }: {
     <button
       onClick={onClick}
       className={`
-        ${large ? 'w-16 h-16' : 'w-12 h-12'}
+        ${large ? 'w-20 h-20' : 'w-14 h-14'}
         rounded-full bg-white/10 hover:bg-white/20 active:bg-white/30 active:scale-90
         flex items-center justify-center text-white transition-all duration-100 select-none
       `}
@@ -79,13 +79,8 @@ async function fetchLyrics(np: NowPlaying): Promise<LyricLine[] | null> {
     const res = await fetch(`/api/spotify/lyrics?${params}`)
     if (!res.ok) return null
     const data = await res.json()
+    // Only use synced lyrics — plain lyrics have no timestamps so 3-line display is meaningless
     if (data.syncedLyrics) return parseLRC(data.syncedLyrics)
-    if (data.plainLyrics) {
-      return data.plainLyrics
-        .split('\n')
-        .filter(Boolean)
-        .map((text: string) => ({ time: 0, text }))
-    }
     return null
   } catch {
     return null
@@ -93,37 +88,22 @@ async function fetchLyrics(np: NowPlaying): Promise<LyricLine[] | null> {
 }
 
 function LyricsDisplay({ lines, positionMs }: { lines: LyricLine[]; positionMs: number }) {
-  const isSynced = lines.some(l => l.time > 0)
-  const activeIdx = isSynced
-    ? lines.reduce((best, line, i) => line.time <= positionMs ? i : best, 0)
-    : -1
-  const activeRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    activeRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
-  }, [activeIdx])
+  const activeIdx = lines.reduce((best, line, i) => line.time <= positionMs ? i : best, 0)
+  const prev = activeIdx > 0 ? lines[activeIdx - 1].text : null
+  const curr = lines[activeIdx]?.text ?? null
+  const next = lines[activeIdx + 1]?.text ?? null
 
   return (
-    <div className="w-full h-full overflow-y-auto no-scrollbar flex flex-col gap-1.5 py-3 px-1">
-      {lines.map((line, i) => {
-        const isCurrent = isSynced && i === activeIdx
-        const isPast = isSynced && i < activeIdx
-        return (
-          <div
-            key={i}
-            ref={isCurrent ? activeRef : null}
-            className={`text-center px-2 transition-all duration-300 leading-snug select-none ${
-              isCurrent
-                ? 'text-white font-semibold text-sm scale-105'
-                : isPast
-                  ? 'text-white/30 text-xs'
-                  : 'text-white/60 text-xs'
-            }`}
-          >
-            {line.text}
-          </div>
-        )
-      })}
+    <div className="flex flex-col items-center gap-1.5 py-1 px-3">
+      <p className={`text-center text-xs leading-snug transition-all duration-300 ${prev ? 'text-white/30' : 'invisible'}`}>
+        {prev ?? '​'}
+      </p>
+      <p className="text-center text-sm font-semibold text-white leading-snug transition-all duration-300">
+        {curr}
+      </p>
+      <p className={`text-center text-xs leading-snug transition-all duration-300 ${next ? 'text-white/40' : 'invisible'}`}>
+        {next ?? '​'}
+      </p>
     </div>
   )
 }
@@ -167,15 +147,12 @@ export default function SpotifyPlayer() {
     return () => clearInterval(id)
   }, [state.nowPlaying?.isPlaying, state.nowPlaying?.trackName])
 
-  // Fetch lyrics when track changes — key by "artist|track" to avoid object-reference churn
+  // Fetch lyrics when track changes
   const np = state.nowPlaying
   const trackKey = np ? `${np.artistName}|${np.trackName}` : null
   useEffect(() => {
-    if (!np || !trackKey) {
-      setLyrics(undefined)
-      return
-    }
-    setLyrics(undefined) // loading
+    if (!np || !trackKey) { setLyrics(undefined); return }
+    setLyrics(undefined)
     fetchLyrics(np).then(result => setLyrics(result))
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [trackKey])
@@ -204,25 +181,25 @@ export default function SpotifyPlayer() {
   const progress = np ? Math.min((position / np.durationMs) * 100, 100) : 0
 
   return (
-    <div className="flex flex-col h-full gap-2">
+    <div className="flex flex-col h-full items-center gap-3 pt-2">
       {/* Album art */}
-      <div className="shrink-0 flex justify-center pt-1">
+      <div className="shrink-0">
         {np?.albumArtUrl ? (
           <img src={np.albumArtUrl} alt={np.albumName}
-            className="w-32 h-32 rounded-xl shadow-2xl object-cover" />
+            className="w-48 h-48 rounded-2xl shadow-2xl object-cover" />
         ) : (
-          <div className="w-32 h-32 rounded-xl bg-white/5 flex items-center justify-center">
-            <span className="text-4xl">🎵</span>
+          <div className="w-48 h-48 rounded-2xl bg-white/5 flex items-center justify-center">
+            <span className="text-5xl">🎵</span>
           </div>
         )}
       </div>
 
       {/* Track info */}
-      <div className="shrink-0 text-center">
+      <div className="shrink-0 text-center w-full px-2">
         {np ? (
           <>
-            <p className="text-white font-semibold text-sm truncate">{np.trackName}</p>
-            <p className="text-white/60 text-xs truncate">{np.artistName}</p>
+            <p className="text-white font-semibold text-base truncate">{np.trackName}</p>
+            <p className="text-white/60 text-sm truncate">{np.artistName}</p>
           </>
         ) : (
           <p className="text-white/40 text-sm">Nothing playing</p>
@@ -236,7 +213,7 @@ export default function SpotifyPlayer() {
       </div>
 
       {/* Controls */}
-      <div className="shrink-0 flex items-center justify-center gap-4">
+      <div className="shrink-0 flex items-center justify-center gap-5">
         <CtrlBtn onClick={() => control('previous')}><IconPrev /></CtrlBtn>
         <CtrlBtn onClick={() => control(np?.isPlaying ? 'pause' : 'play')} large>
           {np?.isPlaying ? <IconPause /> : <IconPlay />}
@@ -244,13 +221,13 @@ export default function SpotifyPlayer() {
         <CtrlBtn onClick={() => control('next')}><IconNext /></CtrlBtn>
       </div>
 
-      {/* Lyrics — below controls, fills remaining space */}
-      <div className="flex-1 min-h-0 border-t border-white/10">
+      {/* Lyrics — 3-line display below controls */}
+      <div className="shrink-0 w-full border-t border-white/10 pt-2">
         {lyrics === undefined && np && (
-          <p className="text-center text-white/30 text-xs pt-3">Loading lyrics…</p>
+          <p className="text-center text-white/25 text-xs">Loading lyrics…</p>
         )}
         {lyrics === null && np && (
-          <p className="text-center text-white/25 text-xs pt-3">No lyrics available</p>
+          <p className="text-center text-white/20 text-xs">No lyrics available</p>
         )}
         {lyrics && lyrics.length > 0 && (
           <LyricsDisplay lines={lyrics} positionMs={position} />

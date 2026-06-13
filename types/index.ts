@@ -24,6 +24,7 @@ export interface CalendarEvent {
   start: string   // ISO 8601
   end: string
   allDay: boolean
+  calendarName?: string
 }
 
 export interface NowPlaying {
