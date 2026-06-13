@@ -3,7 +3,7 @@ import { encryptToken } from '@/lib/cookies'
 import type { OAuthToken } from '@/types'
 
 export async function GET(req: NextRequest) {
-  const origin = new URL(req.url).origin
+  const origin = process.env.NEXT_PUBLIC_APP_URL ?? new URL(req.url).origin
   const code = req.nextUrl.searchParams.get('code')
   if (!code) return NextResponse.redirect(`${origin}?spotify_error=1`)
 

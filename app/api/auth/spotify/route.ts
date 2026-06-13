@@ -7,7 +7,7 @@ const SCOPES = [
 ].join(' ')
 
 export async function GET(req: NextRequest) {
-  const origin = new URL(req.url).origin
+  const origin = process.env.NEXT_PUBLIC_APP_URL ?? new URL(req.url).origin
   const params = new URLSearchParams({
     client_id: process.env.SPOTIFY_CLIENT_ID!,
     response_type: 'code',
