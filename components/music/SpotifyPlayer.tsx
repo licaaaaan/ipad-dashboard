@@ -198,6 +198,7 @@ interface SDKPlayer {
   previousTrack(): Promise<void>
   setVolume(v: number): Promise<void>
   addListener(event: 'ready', cb: (e: { device_id: string }) => void): void
+  addListener(event: 'not_ready', cb: (e: { device_id: string }) => void): void
   addListener(event: 'player_state_changed', cb: (state: SDKState | null) => void): void
   addListener(event: string, cb: (arg: unknown) => void): void
 }
@@ -213,6 +214,7 @@ declare global {
 function SDKPlayerView() {
   const [connected, setConnected] = useState(false)
   const [deviceId, setDeviceId] = useState<string | null>(null)
+  const [offline, setOffline] = useState(false)
   const [playbackState, setPlaybackState] = useState<SDKState | null>(null)
   const [volume, setVolume] = useState(0.8)
   const [position, setPosition] = useState(0)
@@ -236,12 +238,26 @@ function SDKPlayerView() {
       },
       volume: volumeRef.current,
     })
-    player.addListener('ready', ({ device_id }) => setDeviceId(device_id))
+    player.addListener('ready', ({ device_id }) => {
+      setDeviceId(device_id)
+      setOffline(false)
+    })
+    player.addListener('not_ready', () => {
+      setDeviceId(null)
+      setPlaybackState(null)
+      setOffline(true)
+    })
     player.addListener('player_state_changed', (state) => {
-      if (!state) return
+      if (!state) {
+        setPlaybackState(null)  // stops the progress ticker
+        return
+      }
       setPlaybackState(state)
       positionRef.current = state.position
       setPosition(state.position)
+    })
+    player.addListener('playback_error', (e) => {
+      console.error('[Spotify SDK] playback_error:', (e as { message: string }).message)
     })
     player.connect()
     playerRef.current = player
@@ -258,11 +274,13 @@ function SDKPlayerView() {
     return () => { playerRef.current?.disconnect(); playerRef.current = null }
   }, [connected, initPlayer])
 
+  const isPlaying = !!(playbackState && !playbackState.paused)
+  const trackName = playbackState?.track_window.current_track.name
   useEffect(() => {
-    if (!playbackState || playbackState.paused) return
+    if (!isPlaying) return
     const id = setInterval(() => { positionRef.current += 1000; setPosition(positionRef.current) }, 1000)
     return () => clearInterval(id)
-  }, [playbackState?.paused, playbackState?.track_window.current_track.name])
+  }, [isPlaying, trackName])
 
   async function transfer() {
     if (!deviceId) return
@@ -291,7 +309,6 @@ function SDKPlayerView() {
 
   const track = playbackState?.track_window.current_track
   const progress = playbackState ? Math.min((position / playbackState.duration) * 100, 100) : 0
-  const isPlaying = playbackState ? !playbackState.paused : false
 
   return (
     <div className="flex flex-col h-full gap-4 justify-between">
@@ -318,7 +335,14 @@ function SDKPlayerView() {
         )}
       </div>
 
-      {deviceId && !playbackState && (
+      {offline && (
+        <button onClick={() => { setOffline(false); playerRef.current?.connect() }}
+          className="shrink-0 text-sm text-yellow-300 hover:text-yellow-200 flex items-center gap-2 justify-center py-2 rounded-full bg-white/5 active:bg-white/10 transition-all">
+          ↻ Player went offline — tap to reconnect
+        </button>
+      )}
+
+      {!offline && deviceId && !playbackState && (
         <button onClick={transfer}
           className="shrink-0 text-sm text-green-300 hover:text-green-200 active:text-green-100 flex items-center gap-2 justify-center py-2 rounded-full bg-white/5 active:bg-white/10 transition-all">
           <IconPlay /> Play on this device
