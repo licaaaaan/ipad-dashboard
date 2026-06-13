@@ -15,6 +15,9 @@ html, body {
   100% { background-position: 0% 50%; }
 }
 
+.no-scrollbar { scrollbar-width: none; }
+.no-scrollbar::-webkit-scrollbar { display: none; }
+
 .aurora-bg {
   background: linear-gradient(
     -45deg,

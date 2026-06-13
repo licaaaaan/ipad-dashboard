@@ -2,7 +2,7 @@
 import { useEffect, useState, useRef, useCallback } from 'react'
 import type { NowPlaying } from '@/types'
 
-// ── SVG icons ──────────────────────────────────────────────────────────────
+// ── SVG icons ───────────────────────────────────────────────────────────────
 
 function IconPrev() {
   return (
@@ -47,8 +47,6 @@ function IconVolumeHigh() {
   )
 }
 
-// ── Control button ──────────────────────────────────────────────────────────
-
 function CtrlBtn({ onClick, children, large = false }: {
   onClick: () => void
   children: React.ReactNode
@@ -68,22 +66,84 @@ function CtrlBtn({ onClick, children, large = false }: {
   )
 }
 
-// ── iOS detection (SDK not supported on iOS Safari) ─────────────────────────
+// ── Lyrics ──────────────────────────────────────────────────────────────────
 
-function detectIOS(): boolean {
-  if (typeof navigator === 'undefined') return false
-  return /iPad|iPhone|iPod/.test(navigator.userAgent) ||
-    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
+interface LyricLine { time: number; text: string }
+
+function parseLRC(lrc: string): LyricLine[] {
+  return lrc
+    .split('\n')
+    .flatMap(line => {
+      const m = line.match(/\[(\d+):(\d+(?:\.\d+)?)\](.*)/)
+      if (!m) return []
+      return [{ time: (parseInt(m[1]) * 60 + parseFloat(m[2])) * 1000, text: m[3].trim() }]
+    })
+    .filter(l => l.text)
+    .sort((a, b) => a.time - b.time)
 }
 
-// ── REST-based player (iOS fallback) ────────────────────────────────────────
+async function fetchLyrics(np: NowPlaying): Promise<LyricLine[] | null> {
+  try {
+    const params = new URLSearchParams({
+      artist_name: np.artistName,
+      track_name: np.trackName,
+      album_name: np.albumName,
+      duration: String(Math.round(np.durationMs / 1000)),
+    })
+    const res = await fetch(`https://lrclib.net/api/get?${params}`)
+    if (!res.ok) return null
+    const data = await res.json()
+    if (data.syncedLyrics) return parseLRC(data.syncedLyrics)
+    if (data.plainLyrics) return data.plainLyrics.split('\n').filter(Boolean).map((text: string) => ({ time: 0, text }))
+    return null
+  } catch {
+    return null
+  }
+}
 
-function RESTPlayer() {
+function LyricsDisplay({ lines, positionMs }: { lines: LyricLine[]; positionMs: number }) {
+  const activeIdx = lines.reduce((best, line, i) => line.time <= positionMs ? i : best, 0)
+  const activeRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    activeRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+  }, [activeIdx])
+
+  return (
+    <div className="flex-1 min-h-0 overflow-y-auto no-scrollbar flex flex-col gap-1 py-2">
+      {lines.map((line, i) => {
+        const isCurrent = i === activeIdx
+        const isPast = i < activeIdx
+        return (
+          <div
+            key={i}
+            ref={isCurrent ? activeRef : null}
+            className={`text-center px-1 transition-all duration-300 leading-snug select-none ${
+              isCurrent
+                ? 'text-white font-semibold text-sm scale-105'
+                : isPast
+                  ? 'text-white/30 text-xs'
+                  : 'text-white/50 text-xs'
+            }`}
+          >
+            {line.text}
+          </div>
+        )
+      })}
+    </div>
+  )
+}
+
+// ── Main player ─────────────────────────────────────────────────────────────
+
+export default function SpotifyPlayer() {
   const [state, setState] = useState<{ connected: boolean; nowPlaying: NowPlaying | null }>({
     connected: false, nowPlaying: null,
   })
   const [position, setPosition] = useState(0)
+  const [lyrics, setLyrics] = useState<LyricLine[] | null>(null)
   const positionRef = useRef(0)
+  const lastTrackRef = useRef('')
 
   const poll = useCallback(async () => {
     const res = await fetch('/api/spotify/now-playing')
@@ -103,6 +163,7 @@ function RESTPlayer() {
     return () => clearInterval(id)
   }, [poll])
 
+  // Progress ticker
   useEffect(() => {
     if (!state.nowPlaying?.isPlaying) return
     const id = setInterval(() => {
@@ -111,6 +172,15 @@ function RESTPlayer() {
     }, 1000)
     return () => clearInterval(id)
   }, [state.nowPlaying?.isPlaying, state.nowPlaying?.trackName])
+
+  // Fetch lyrics when track changes
+  useEffect(() => {
+    const np = state.nowPlaying
+    if (!np || np.trackName === lastTrackRef.current) return
+    lastTrackRef.current = np.trackName
+    setLyrics(null)
+    fetchLyrics(np).then(setLyrics)
+  }, [state.nowPlaying?.trackName])
 
   async function control(action: 'play' | 'pause' | 'next' | 'previous') {
     await fetch('/api/spotify/control', {
@@ -137,35 +207,45 @@ function RESTPlayer() {
   const progress = np ? Math.min((position / np.durationMs) * 100, 100) : 0
 
   return (
-    <div className="flex flex-col h-full gap-4 justify-between">
-      <div className="flex-1 min-h-0 flex items-center justify-center">
+    <div className="flex flex-col h-full gap-3">
+      {/* Album art */}
+      <div className="shrink-0 flex justify-center">
         {np?.albumArtUrl ? (
           <img src={np.albumArtUrl} alt={np.albumName}
-            className="w-full max-h-full object-contain rounded-xl shadow-2xl" />
+            className="w-36 h-36 rounded-xl shadow-2xl object-cover" />
         ) : (
-          <div className="w-full aspect-square rounded-xl bg-white/5 flex items-center justify-center">
+          <div className="w-36 h-36 rounded-xl bg-white/5 flex items-center justify-center">
             <span className="text-4xl">🎵</span>
           </div>
         )}
       </div>
 
-      <div className="shrink-0 min-h-[3rem]">
+      {/* Track info */}
+      <div className="shrink-0">
         {np ? (
           <>
-            <p className="text-white font-semibold text-base truncate">{np.trackName}</p>
-            <p className="text-white/60 text-sm truncate">{np.artistName}</p>
-            <p className="text-white/40 text-xs truncate">{np.albumName}</p>
+            <p className="text-white font-semibold text-sm truncate">{np.trackName}</p>
+            <p className="text-white/60 text-xs truncate">{np.artistName}</p>
           </>
         ) : (
           <p className="text-white/40 text-sm">Nothing playing</p>
         )}
       </div>
 
+      {/* Lyrics */}
+      {lyrics && lyrics.length > 0 && np ? (
+        <LyricsDisplay lines={lyrics} positionMs={position} />
+      ) : (
+        <div className="flex-1" />
+      )}
+
+      {/* Progress bar */}
       <div className="shrink-0 w-full h-1.5 bg-white/20 rounded-full overflow-hidden">
         <div className="h-full bg-green-400 rounded-full transition-all duration-1000"
           style={{ width: `${progress}%` }} />
       </div>
 
+      {/* Controls */}
       <div className="shrink-0 flex items-center justify-center gap-4 pb-1">
         <CtrlBtn onClick={() => control('previous')}><IconPrev /></CtrlBtn>
         <CtrlBtn onClick={() => control(np?.isPlaying ? 'pause' : 'play')} large>
@@ -175,208 +255,4 @@ function RESTPlayer() {
       </div>
     </div>
   )
-}
-
-// ── SDK types ───────────────────────────────────────────────────────────────
-
-interface SDKTrack {
-  name: string
-  artists: Array<{ name: string }>
-  album: { name: string; images: Array<{ url: string }> }
-}
-interface SDKState {
-  paused: boolean
-  position: number
-  duration: number
-  track_window: { current_track: SDKTrack }
-}
-interface SDKPlayer {
-  connect(): Promise<boolean>
-  disconnect(): void
-  togglePlay(): Promise<void>
-  nextTrack(): Promise<void>
-  previousTrack(): Promise<void>
-  setVolume(v: number): Promise<void>
-  addListener(event: 'ready', cb: (e: { device_id: string }) => void): void
-  addListener(event: 'not_ready', cb: (e: { device_id: string }) => void): void
-  addListener(event: 'player_state_changed', cb: (state: SDKState | null) => void): void
-  addListener(event: string, cb: (arg: unknown) => void): void
-}
-declare global {
-  interface Window {
-    Spotify: { Player: new (opts: { name: string; getOAuthToken: (cb: (t: string) => void) => void; volume?: number }) => SDKPlayer }
-    onSpotifyWebPlaybackSDKReady: () => void
-  }
-}
-
-// ── SDK-based player (desktop) ──────────────────────────────────────────────
-
-function SDKPlayerView() {
-  const [connected, setConnected] = useState(false)
-  const [deviceId, setDeviceId] = useState<string | null>(null)
-  const [offline, setOffline] = useState(false)
-  const [playbackState, setPlaybackState] = useState<SDKState | null>(null)
-  const [volume, setVolume] = useState(0.8)
-  const [position, setPosition] = useState(0)
-  const playerRef = useRef<SDKPlayer | null>(null)
-  const positionRef = useRef(0)
-  const volumeRef = useRef(0.8)
-
-  useEffect(() => {
-    fetch('/api/spotify/token').then(r => { if (r.ok) setConnected(true) }).catch(() => {})
-  }, [])
-
-  const initPlayer = useCallback(() => {
-    if (!window.Spotify || playerRef.current) return
-    const player = new window.Spotify.Player({
-      name: 'iPad Dashboard',
-      getOAuthToken: (cb) => {
-        fetch('/api/spotify/token')
-          .then(r => r.ok ? r.json() : Promise.reject())
-          .then(({ access_token }) => cb(access_token))
-          .catch(() => {})
-      },
-      volume: volumeRef.current,
-    })
-    player.addListener('ready', ({ device_id }) => {
-      setDeviceId(device_id)
-      setOffline(false)
-    })
-    player.addListener('not_ready', () => {
-      setDeviceId(null)
-      setPlaybackState(null)
-      setOffline(true)
-    })
-    player.addListener('player_state_changed', (state) => {
-      if (!state) {
-        setPlaybackState(null)  // stops the progress ticker
-        return
-      }
-      setPlaybackState(state)
-      positionRef.current = state.position
-      setPosition(state.position)
-    })
-    player.addListener('playback_error', (e) => {
-      console.error('[Spotify SDK] playback_error:', (e as { message: string }).message)
-    })
-    player.connect()
-    playerRef.current = player
-  }, [])
-
-  useEffect(() => {
-    if (!connected) return
-    if (window.Spotify) { initPlayer() } else {
-      window.onSpotifyWebPlaybackSDKReady = initPlayer
-      const s = document.createElement('script')
-      s.src = 'https://sdk.scdn.co/spotify-player.js'
-      document.head.appendChild(s)
-    }
-    return () => { playerRef.current?.disconnect(); playerRef.current = null }
-  }, [connected, initPlayer])
-
-  const isPlaying = !!(playbackState && !playbackState.paused)
-  const trackName = playbackState?.track_window.current_track.name
-  useEffect(() => {
-    if (!isPlaying) return
-    const id = setInterval(() => { positionRef.current += 1000; setPosition(positionRef.current) }, 1000)
-    return () => clearInterval(id)
-  }, [isPlaying, trackName])
-
-  async function transfer() {
-    if (!deviceId) return
-    await fetch('/api/spotify/transfer-playback', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ deviceId }),
-    })
-  }
-
-  async function handleVolume(v: number) {
-    volumeRef.current = v; setVolume(v)
-    await playerRef.current?.setVolume(v)
-  }
-
-  if (!connected) {
-    return (
-      <div className="flex flex-col items-center justify-center h-full gap-4">
-        <p className="text-white/50 text-sm text-center">Spotify not connected</p>
-        <a href="/api/auth/spotify"
-          className="px-5 py-2.5 bg-green-500 hover:bg-green-400 text-white text-sm font-semibold rounded-full transition-colors">
-          Connect Spotify
-        </a>
-      </div>
-    )
-  }
-
-  const track = playbackState?.track_window.current_track
-  const progress = playbackState ? Math.min((position / playbackState.duration) * 100, 100) : 0
-
-  return (
-    <div className="flex flex-col h-full gap-4 justify-between">
-      <div className="flex-1 min-h-0 flex items-center justify-center">
-        {track?.album.images[0]?.url ? (
-          <img src={track.album.images[0].url} alt={track.album.name}
-            className="w-full max-h-full object-contain rounded-xl shadow-2xl" />
-        ) : (
-          <div className="w-full aspect-square rounded-xl bg-white/5 flex items-center justify-center">
-            <span className="text-4xl">🎵</span>
-          </div>
-        )}
-      </div>
-
-      <div className="shrink-0 min-h-[3rem]">
-        {track ? (
-          <>
-            <p className="text-white font-semibold text-base truncate">{track.name}</p>
-            <p className="text-white/60 text-sm truncate">{track.artists.map(a => a.name).join(', ')}</p>
-            <p className="text-white/40 text-xs truncate">{track.album.name}</p>
-          </>
-        ) : (
-          <p className="text-white/40 text-sm">{deviceId ? 'Nothing playing' : 'Connecting…'}</p>
-        )}
-      </div>
-
-      {offline && (
-        <button onClick={() => { setOffline(false); playerRef.current?.connect() }}
-          className="shrink-0 text-sm text-yellow-300 hover:text-yellow-200 flex items-center gap-2 justify-center py-2 rounded-full bg-white/5 active:bg-white/10 transition-all">
-          ↻ Player went offline — tap to reconnect
-        </button>
-      )}
-
-      {!offline && deviceId && !playbackState && (
-        <button onClick={transfer}
-          className="shrink-0 text-sm text-green-300 hover:text-green-200 active:text-green-100 flex items-center gap-2 justify-center py-2 rounded-full bg-white/5 active:bg-white/10 transition-all">
-          <IconPlay /> Play on this device
-        </button>
-      )}
-
-      <div className="shrink-0 w-full h-1.5 bg-white/20 rounded-full overflow-hidden">
-        <div className="h-full bg-green-400 rounded-full transition-all duration-1000"
-          style={{ width: `${progress}%` }} />
-      </div>
-
-      <div className="shrink-0 flex items-center justify-center gap-4">
-        <CtrlBtn onClick={() => playerRef.current?.previousTrack()}><IconPrev /></CtrlBtn>
-        <CtrlBtn onClick={() => playerRef.current?.togglePlay()} large>
-          {isPlaying ? <IconPause /> : <IconPlay />}
-        </CtrlBtn>
-        <CtrlBtn onClick={() => playerRef.current?.nextTrack()}><IconNext /></CtrlBtn>
-      </div>
-
-      <div className="shrink-0 flex items-center gap-2 pb-1">
-        <span className="text-white/40"><IconVolumeLow /></span>
-        <input type="range" min="0" max="1" step="0.02" value={volume}
-          onChange={(e) => handleVolume(parseFloat(e.target.value))}
-          className="flex-1 accent-green-400 cursor-pointer" style={{ height: '4px' }} />
-        <span className="text-white/40"><IconVolumeHigh /></span>
-      </div>
-    </div>
-  )
-}
-
-// ── Entry point ─────────────────────────────────────────────────────────────
-
-export default function SpotifyPlayer() {
-  const [isIOS, setIsIOS] = useState(false)
-  useEffect(() => { setIsIOS(detectIOS()) }, [])
-  return isIOS ? <RESTPlayer /> : <SDKPlayerView />
 }

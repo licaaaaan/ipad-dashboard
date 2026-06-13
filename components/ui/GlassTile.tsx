@@ -11,7 +11,7 @@ export default function GlassTile({ gradient, className = '', children }: GlassT
         relative rounded-2xl p-4 overflow-hidden
         bg-gradient-to-br ${gradient} bg-opacity-50
         border border-white/15 backdrop-blur-md
-        transition-transform duration-150 active:scale-[0.98]
+        transition-transform duration-150
         ${className}
       `}
     >
