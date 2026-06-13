@@ -32,20 +32,6 @@ function IconPause() {
     </svg>
   )
 }
-function IconVolumeLow() {
-  return (
-    <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
-      <path d="M18.5 12A4.5 4.5 0 0 0 16 7.97V16c1.48-.73 2.5-2.25 2.5-4zM5 9v6h4l5 5V4L9 9H5z" />
-    </svg>
-  )
-}
-function IconVolumeHigh() {
-  return (
-    <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
-      <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z" />
-    </svg>
-  )
-}
 
 function CtrlBtn({ onClick, children, large = false }: {
   onClick: () => void
@@ -174,13 +160,13 @@ export default function SpotifyPlayer() {
   }, [state.nowPlaying?.isPlaying, state.nowPlaying?.trackName])
 
   // Fetch lyrics when track changes
+  const nowPlaying = state.nowPlaying
   useEffect(() => {
-    const np = state.nowPlaying
-    if (!np || np.trackName === lastTrackRef.current) return
-    lastTrackRef.current = np.trackName
+    if (!nowPlaying || nowPlaying.trackName === lastTrackRef.current) return
+    lastTrackRef.current = nowPlaying.trackName
     setLyrics(null)
-    fetchLyrics(np).then(setLyrics)
-  }, [state.nowPlaying?.trackName])
+    fetchLyrics(nowPlaying).then(setLyrics)
+  }, [nowPlaying])
 
   async function control(action: 'play' | 'pause' | 'next' | 'previous') {
     await fetch('/api/spotify/control', {
