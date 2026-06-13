@@ -3,13 +3,14 @@ import { encryptToken } from '@/lib/cookies'
 import type { OAuthToken } from '@/types'
 
 export async function GET(req: NextRequest) {
+  const origin = new URL(req.url).origin
   const code = req.nextUrl.searchParams.get('code')
-  if (!code) return NextResponse.redirect(`${process.env.NEXT_PUBLIC_APP_URL}?spotify_error=1`)
+  if (!code) return NextResponse.redirect(`${origin}?spotify_error=1`)
 
   const body = new URLSearchParams({
     grant_type: 'authorization_code',
     code,
-    redirect_uri: `${process.env.NEXT_PUBLIC_APP_URL}/api/auth/spotify/callback`,
+    redirect_uri: `${origin}/api/auth/spotify/callback`,
   })
 
   const res = await fetch('https://accounts.spotify.com/api/token', {
@@ -23,7 +24,7 @@ export async function GET(req: NextRequest) {
     body,
   })
 
-  if (!res.ok) return NextResponse.redirect(`${process.env.NEXT_PUBLIC_APP_URL}?spotify_error=1`)
+  if (!res.ok) return NextResponse.redirect(`${origin}?spotify_error=1`)
 
   const json = await res.json()
   const token: OAuthToken = {
@@ -33,7 +34,7 @@ export async function GET(req: NextRequest) {
   }
 
   const sealed = await encryptToken(token)
-  const response = NextResponse.redirect(`${process.env.NEXT_PUBLIC_APP_URL}?spotify_connected=1`)
+  const response = NextResponse.redirect(`${origin}?spotify_connected=1`)
   response.cookies.set('spotify_token', sealed, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',

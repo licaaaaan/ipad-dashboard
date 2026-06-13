@@ -3,8 +3,6 @@ import { useEffect, useState, useCallback } from 'react'
 import GlassTile from '@/components/ui/GlassTile'
 import type { WeatherData } from '@/types'
 
-const WEATHER_ICON_URL = (icon: string) => `https://openweathermap.org/img/wn/${icon}@2x.png`
-
 export default function WeatherTile({ locationOverride }: { locationOverride?: { lat: number; lon: number } }) {
   const [weather, setWeather] = useState<WeatherData | null>(null)
   const [error, setError] = useState(false)
@@ -26,7 +24,7 @@ export default function WeatherTile({ locationOverride }: { locationOverride?: {
     }
     navigator.geolocation.getCurrentPosition(
       (pos) => load(pos.coords.latitude, pos.coords.longitude),
-      () => load(37.7749, -122.4194)  // fallback: San Francisco
+      () => load(37.7749, -122.4194)
     )
     const id = setInterval(() => {
       navigator.geolocation.getCurrentPosition(
@@ -52,13 +50,13 @@ export default function WeatherTile({ locationOverride }: { locationOverride?: {
               <p className="text-purple-100/80 text-sm capitalize mt-1">{weather.condition}</p>
               <p className="text-purple-200/60 text-xs mt-0.5">{weather.city}</p>
             </div>
-            <img src={WEATHER_ICON_URL(weather.icon)} alt={weather.condition} className="w-16 h-16" />
+            <span className="text-5xl" role="img" aria-label={weather.condition}>{weather.icon}</span>
           </div>
           <div className="flex gap-4 mt-3">
             {weather.forecast.map((day) => (
               <div key={day.date} className="flex flex-col items-center gap-1">
                 <span className="text-purple-200/60 text-xs">{day.date}</span>
-                <img src={WEATHER_ICON_URL(day.icon)} alt="" className="w-8 h-8" />
+                <span className="text-2xl" role="img" aria-label="">{day.icon}</span>
                 <span className="text-white text-xs">{day.high}°</span>
                 <span className="text-purple-200/50 text-xs">{day.low}°</span>
               </div>

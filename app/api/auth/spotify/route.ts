@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 
 const SCOPES = [
   'user-read-currently-playing',
@@ -6,11 +6,12 @@ const SCOPES = [
   'user-modify-playback-state',
 ].join(' ')
 
-export async function GET() {
+export async function GET(req: NextRequest) {
+  const origin = new URL(req.url).origin
   const params = new URLSearchParams({
     client_id: process.env.SPOTIFY_CLIENT_ID!,
     response_type: 'code',
-    redirect_uri: `${process.env.NEXT_PUBLIC_APP_URL}/api/auth/spotify/callback`,
+    redirect_uri: `${origin}/api/auth/spotify/callback`,
     scope: SCOPES,
   })
   return NextResponse.redirect(`https://accounts.spotify.com/authorize?${params}`)

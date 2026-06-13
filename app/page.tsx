@@ -1,41 +1,36 @@
 'use client'
 import { useState } from 'react'
-import ClockTile from '@/components/tiles/ClockTile'
-import WeatherTile from '@/components/tiles/WeatherTile'
+import ClockWeatherTile from '@/components/tiles/ClockWeatherTile'
 import CalendarTile from '@/components/tiles/CalendarTile'
 import MusicTile from '@/components/tiles/MusicTile'
 import SettingsPanel from '@/components/settings/SettingsPanel'
 
 export default function DashboardPage() {
-  const [youtubeUrl, setYoutubeUrl] = useState<string | null>(null)
   const [weatherLocation, setWeatherLocation] = useState<{ lat: number; lon: number } | null>(null)
 
   return (
     <>
       <main
         className="aurora-bg w-screen h-screen p-4 grid gap-3"
-        style={{ gridTemplateColumns: '2fr 1fr 1fr', gridTemplateRows: '1fr 1fr' }}
+        style={{ gridTemplateColumns: '2fr 1fr', gridTemplateRows: '1fr 1fr' }}
       >
-        <div style={{ gridColumn: '1 / 3', gridRow: '1' }}>
-          <WeatherTile locationOverride={weatherLocation ?? undefined} />
+        {/* Top-left: clock + weather combined */}
+        <div style={{ gridColumn: '1', gridRow: '1' }}>
+          <ClockWeatherTile locationOverride={weatherLocation ?? undefined} />
         </div>
 
-        <div style={{ gridColumn: '3', gridRow: '1' }}>
-          <ClockTile />
-        </div>
-
+        {/* Bottom-left: calendar */}
         <div style={{ gridColumn: '1', gridRow: '2' }}>
           <CalendarTile />
         </div>
 
-        <div style={{ gridColumn: '2 / 4', gridRow: '2' }}>
-          <MusicTile youtubeUrl={youtubeUrl} />
+        {/* Right column full-height: Spotify */}
+        <div style={{ gridColumn: '2', gridRow: '1 / 3' }}>
+          <MusicTile />
         </div>
       </main>
 
       <SettingsPanel
-        youtubeUrl={youtubeUrl}
-        onYoutubeUrlChange={setYoutubeUrl}
         weatherLocation={weatherLocation}
         onWeatherLocationChange={setWeatherLocation}
       />

@@ -29,10 +29,10 @@ export default function SpotifyPlayer() {
 
   if (!state.connected) {
     return (
-      <div className="flex flex-col items-center justify-center h-full gap-3">
-        <p className="text-white/50 text-sm">Spotify not connected</p>
+      <div className="flex flex-col items-center justify-center h-full gap-4">
+        <p className="text-white/50 text-sm text-center">Spotify not connected</p>
         <a href="/api/auth/spotify"
-          className="px-4 py-2 bg-green-500 hover:bg-green-400 text-white text-sm font-semibold rounded-full transition-colors">
+          className="px-5 py-2.5 bg-green-500 hover:bg-green-400 text-white text-sm font-semibold rounded-full transition-colors">
           Connect Spotify
         </a>
       </div>
@@ -42,7 +42,7 @@ export default function SpotifyPlayer() {
   if (!state.nowPlaying) {
     return (
       <div className="flex items-center justify-center h-full">
-        <p className="text-white/50 text-sm">Nothing playing on Spotify</p>
+        <p className="text-white/50 text-sm">Nothing playing</p>
       </div>
     )
   }
@@ -51,29 +51,39 @@ export default function SpotifyPlayer() {
   const progress = (np.progressMs / np.durationMs) * 100
 
   return (
-    <div className="flex flex-col h-full gap-3">
-      <div className="flex gap-3 items-center">
-        {np.albumArtUrl && (
-          <img src={np.albumArtUrl} alt={np.albumName}
-            className="w-16 h-16 rounded-lg object-cover shadow-lg flex-shrink-0" />
-        )}
-        <div className="flex-1 min-w-0">
-          <p className="text-white font-semibold text-sm truncate">{np.trackName}</p>
-          <p className="text-white/60 text-xs truncate">{np.artistName}</p>
-          <p className="text-white/40 text-xs truncate">{np.albumName}</p>
+    <div className="flex flex-col h-full gap-4 justify-between">
+      {/* Album art — large, fills vertical space */}
+      {np.albumArtUrl && (
+        <div className="flex-1 min-h-0 flex items-center justify-center">
+          <img
+            src={np.albumArtUrl}
+            alt={np.albumName}
+            className="w-full max-h-full object-contain rounded-xl shadow-2xl"
+          />
         </div>
+      )}
+
+      {/* Track info */}
+      <div className="shrink-0">
+        <p className="text-white font-semibold text-base truncate">{np.trackName}</p>
+        <p className="text-white/60 text-sm truncate">{np.artistName}</p>
+        <p className="text-white/40 text-xs truncate">{np.albumName}</p>
       </div>
 
-      <div className="w-full h-1 bg-white/20 rounded-full overflow-hidden">
-        <div className="h-full bg-green-400 rounded-full transition-all duration-500"
-          style={{ width: `${progress}%` }} />
+      {/* Progress bar */}
+      <div className="shrink-0 w-full h-1 bg-white/20 rounded-full overflow-hidden">
+        <div
+          className="h-full bg-green-400 rounded-full transition-all duration-500"
+          style={{ width: `${progress}%` }}
+        />
       </div>
 
-      <div className="flex items-center justify-center gap-6">
+      {/* Controls */}
+      <div className="shrink-0 flex items-center justify-center gap-8 pb-1">
         {[
-          { action: 'previous' as const, label: '⏮', size: 'text-xl' },
-          { action: np.isPlaying ? 'pause' : 'play', label: np.isPlaying ? '⏸' : '▶', size: 'text-2xl' },
-          { action: 'next' as const, label: '⏭', size: 'text-xl' },
+          { action: 'previous' as const, label: '⏮', size: 'text-2xl' },
+          { action: np.isPlaying ? 'pause' : 'play', label: np.isPlaying ? '⏸' : '▶', size: 'text-3xl' },
+          { action: 'next' as const, label: '⏭', size: 'text-2xl' },
         ].map(({ action, label, size }) => (
           <button key={action}
             onClick={() => control(action as 'play' | 'pause' | 'next' | 'previous')}
