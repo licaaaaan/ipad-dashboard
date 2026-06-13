@@ -40,7 +40,8 @@ export async function GET(req: NextRequest) {
       })
     }
     return res
-  } catch {
-    return NextResponse.json({ connected: false, events: [], error: 'Google Calendar unavailable' })
+  } catch (err) {
+    console.error('[google-calendar]', err)
+    return NextResponse.json({ connected: false, events: [], error: String(err) })
   }
 }
