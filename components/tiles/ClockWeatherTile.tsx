@@ -47,14 +47,14 @@ export default function ClockWeatherTile({ locationOverride }: { locationOverrid
   }, [load, locationOverride])
 
   return (
-    <GlassTile gradient="from-amber-500 to-purple-700" className="h-full flex flex-col justify-between">
+    <GlassTile gradient="from-sky-200 to-indigo-200" className="h-full flex flex-col justify-between">
       {/* Time + Date */}
       <div className="flex items-start justify-between">
         <div>
           <span className="text-7xl font-light text-white tabular-nums tracking-tight">
             {now ? formatTime(now) : '--:--:--'}
           </span>
-          <p className="text-amber-100/70 text-xl font-medium mt-2">
+          <p className="text-sky-100/70 text-xl font-medium mt-2">
             {now ? formatDate(now) : ''}
           </p>
         </div>
@@ -66,8 +66,8 @@ export default function ClockWeatherTile({ locationOverride }: { locationOverrid
               <span className="text-white text-6xl font-light">{weather.temp}°</span>
               <span className="text-6xl" role="img" aria-label={weather.condition}>{weather.icon}</span>
             </div>
-            <p className="text-purple-100/70 text-lg capitalize text-right">{weather.condition}</p>
-            <p className="text-purple-100/90 text-xl text-right font-medium">📍 {weather.city}</p>
+            <p className="text-indigo-100/70 text-lg capitalize text-right">{weather.condition}</p>
+            <p className="text-indigo-100/90 text-xl text-right font-medium">📍 {weather.city}</p>
           </div>
         )}
       </div>
@@ -77,10 +77,10 @@ export default function ClockWeatherTile({ locationOverride }: { locationOverrid
         <div className="flex gap-6">
           {weather.forecast.map((day) => (
             <div key={day.date} className="flex flex-col items-center gap-1">
-              <span className="text-purple-200/60 text-lg">{day.date}</span>
+              <span className="text-indigo-200/60 text-lg">{day.date}</span>
               <span className="text-3xl" role="img" aria-label="">{day.icon}</span>
               <span className="text-white text-lg">{day.high}°</span>
-              <span className="text-purple-200/50 text-base">{day.low}°</span>
+              <span className="text-indigo-200/50 text-base">{day.low}°</span>
             </div>
           ))}
         </div>

@@ -53,7 +53,7 @@ export default function GoogleCalendar() {
       <div className="flex flex-col items-center justify-center h-full gap-3">
         <p className="text-white/50 text-xl">Google Calendar</p>
         <a href="/api/auth/google"
-          className="px-4 py-2 bg-emerald-500 hover:bg-emerald-400 text-white text-lg font-semibold rounded-full transition-colors">
+          className="px-4 py-2 bg-cyan-400 hover:bg-cyan-300 text-white text-lg font-semibold rounded-full transition-colors">
           Connect Google
         </a>
       </div>
@@ -65,7 +65,7 @@ export default function GoogleCalendar() {
   if (groups.length === 0) {
     return (
       <div className="flex flex-col h-full gap-1">
-        <p className="text-emerald-200/60 text-lg font-semibold tracking-widest uppercase mb-1">This Week</p>
+        <p className="text-cyan-200/60 text-lg font-semibold tracking-widest uppercase mb-1">This Week</p>
         <div className="flex items-center justify-center flex-1">
           <p className="text-white/40 text-xl">No events this week</p>
         </div>
@@ -75,10 +75,10 @@ export default function GoogleCalendar() {
 
   return (
     <div className="flex flex-col gap-3 h-full overflow-y-auto no-scrollbar">
-      <p className="text-emerald-200/60 text-lg font-semibold tracking-widest uppercase shrink-0">This Week</p>
+      <p className="text-cyan-200/60 text-lg font-semibold tracking-widest uppercase shrink-0">This Week</p>
       {groups.map(group => (
         <div key={group.key} className="shrink-0">
-          <p className="text-emerald-300/80 text-lg font-semibold mb-1.5">{group.label}</p>
+          <p className="text-cyan-300/80 text-lg font-semibold mb-1.5">{group.label}</p>
           <div className="flex flex-col gap-1.5 pl-1">
             {group.events.map(event => (
               <div key={event.id} className="flex gap-3 items-baseline min-w-0">

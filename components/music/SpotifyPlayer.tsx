@@ -167,7 +167,7 @@ export default function SpotifyPlayer() {
       <div className="flex flex-col items-center justify-center h-full gap-4">
         <p className="text-white/50 text-xl text-center">Spotify not connected</p>
         <a href="/api/auth/spotify"
-          className="px-6 py-3 bg-green-500 hover:bg-green-400 text-white text-lg font-semibold rounded-full transition-colors">
+          className="px-6 py-3 bg-pink-400 hover:bg-pink-300 text-white text-lg font-semibold rounded-full transition-colors">
           Connect Spotify
         </a>
       </div>
@@ -204,7 +204,7 @@ export default function SpotifyPlayer() {
 
       {/* Progress bar */}
       <div className="shrink-0 w-full h-2 bg-white/20 rounded-full overflow-hidden">
-        <div className="h-full bg-green-400 rounded-full transition-all duration-1000"
+        <div className="h-full bg-pink-300 rounded-full transition-all duration-1000"
           style={{ width: `${progress}%` }} />
       </div>
 

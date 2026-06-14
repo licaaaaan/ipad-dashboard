@@ -6,7 +6,7 @@ html, body {
   height: 100%;
   margin: 0;
   overflow: hidden;
-  background: #020617;
+  background: #0a0f1e;
 }
 
 @keyframes aurora {
@@ -21,11 +21,11 @@ html, body {
 .aurora-bg {
   background: linear-gradient(
     -45deg,
-    #020617,
-    #0a0a2e,
-    #0d1f3c,
-    #120a2e,
-    #020617
+    #0d1a2e,
+    #0f1226,
+    #1a1030,
+    #0d1528,
+    #0a0f20
   );
   background-size: 400% 400%;
   animation: aurora 20s ease infinite;
