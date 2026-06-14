@@ -4,7 +4,7 @@ import GlassTile from '@/components/ui/GlassTile'
 import type { WeatherData } from '@/types'
 
 function formatTime(date: Date): string {
-  return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true })
+  return date.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false })
 }
 
 function formatDate(date: Date): string {
@@ -52,7 +52,7 @@ export default function ClockWeatherTile({ locationOverride }: { locationOverrid
       <div className="flex items-start justify-between">
         <div>
           <span className="text-7xl font-light text-white tabular-nums tracking-tight">
-            {now ? formatTime(now) : '--:--:--'}
+            {now ? formatTime(now) : '--:--'}
           </span>
           <p className="text-sky-100/70 text-xl font-medium mt-2">
             {now ? formatDate(now) : ''}
