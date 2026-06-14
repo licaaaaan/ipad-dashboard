@@ -81,7 +81,7 @@ export default function GoogleCalendar() {
           <p className="text-emerald-300/80 text-lg font-semibold mb-1.5">{group.label}</p>
           <div className="flex flex-col gap-1.5 pl-1">
             {group.events.map(event => (
-              <div key={event.id} className="flex gap-3 items-baseline">
+              <div key={event.id} className="flex gap-3 items-baseline min-w-0">
                 <span className="text-white/50 text-base shrink-0 w-20">{formatTime(event)}</span>
                 <span className="text-white text-base truncate flex-1">{event.title}</span>
                 {event.calendarName && (

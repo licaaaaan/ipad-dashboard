@@ -15,17 +15,17 @@ export default function DashboardPage() {
         style={{ gridTemplateColumns: '2fr 1fr', gridTemplateRows: '1fr 1fr' }}
       >
         {/* Top-left: clock + weather combined */}
-        <div style={{ gridColumn: '1', gridRow: '1' }}>
+        <div style={{ gridColumn: '1', gridRow: '1' }} className="h-full overflow-hidden">
           <ClockWeatherTile locationOverride={weatherLocation ?? undefined} />
         </div>
 
         {/* Bottom-left: calendar */}
-        <div style={{ gridColumn: '1', gridRow: '2' }}>
+        <div style={{ gridColumn: '1', gridRow: '2' }} className="h-full overflow-hidden">
           <CalendarTile />
         </div>
 
         {/* Right column full-height: Spotify */}
-        <div style={{ gridColumn: '2', gridRow: '1 / 3' }}>
+        <div style={{ gridColumn: '2', gridRow: '1 / 3' }} className="h-full overflow-hidden">
           <MusicTile />
         </div>
       </main>
