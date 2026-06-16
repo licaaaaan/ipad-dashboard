@@ -36,3 +36,28 @@ export interface NowPlaying {
   progressMs: number
   durationMs: number
 }
+
+export interface Task {
+  id: string
+  title: string
+  due?: string
+  notes?: string
+}
+
+export interface TaskList {
+  id: string
+  title: string
+  tasks: Task[]
+}
+
+export interface NewsItem {
+  title: string
+  link: string
+  source: string
+  pubDate: string
+}
+
+export interface BingPhoto {
+  url: string
+  title: string
+}
