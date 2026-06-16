@@ -23,7 +23,10 @@ describe('fetchUpcomingEvents', () => {
       ],
     }
 
-    const mockListFn = vi.fn().mockResolvedValue({ data: mockEvents })
+    const mockEventsList = vi.fn().mockResolvedValue({ data: mockEvents })
+    const mockCalListList = vi.fn().mockResolvedValue({
+      data: { items: [{ id: 'primary', summary: 'My Calendar' }] },
+    })
 
     vi.doMock('googleapis', () => ({
       google: {
@@ -33,9 +36,8 @@ describe('fetchUpcomingEvents', () => {
           },
         },
         calendar: vi.fn().mockReturnValue({
-          events: {
-            list: mockListFn,
-          },
+          calendarList: { list: mockCalListList },
+          events: { list: mockEventsList },
         }),
       },
     }))
