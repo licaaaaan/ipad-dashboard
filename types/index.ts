@@ -40,7 +40,7 @@ export interface NowPlaying {
 export interface Task {
   id: string
   title: string
-  due?: string
+  due?: string  // ISO 8601 date, e.g. "2026-06-20T00:00:00.000Z"
   notes?: string
 }
 
@@ -54,7 +54,7 @@ export interface NewsItem {
   title: string
   link: string
   source: string
-  pubDate: string
+  pubDate: string  // RFC 2822 or ISO 8601
 }
 
 export interface BingPhoto {
