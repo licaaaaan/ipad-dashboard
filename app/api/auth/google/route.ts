@@ -10,7 +10,10 @@ export async function GET(req: NextRequest) {
   )
   const url = auth.generateAuthUrl({
     access_type: 'offline',
-    scope: ['https://www.googleapis.com/auth/calendar.readonly'],
+    scope: [
+      'https://www.googleapis.com/auth/calendar.readonly',
+      'https://www.googleapis.com/auth/tasks',
+    ],
     prompt: 'consent',
   })
   return NextResponse.redirect(url)
