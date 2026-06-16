@@ -33,12 +33,16 @@ export async function fetchRssHeadlines(feedUrl: string, limit = 8): Promise<New
 
     return rawItems
       .slice(0, limit)
-      .map((item: any): NewsItem => ({
-        title: typeof item.title === 'object' ? (item.title?.['#text'] ?? '') : (item.title ?? ''),
-        link: item.link?.['@_href'] ?? item.link ?? '',
-        source,
-        pubDate: item.pubDate ?? item.updated ?? item.published ?? '',
-      }))
+      .map((raw): NewsItem => {
+        const item = raw as Record<string, unknown>
+        const title = typeof item.title === 'object'
+          ? ((item.title as Record<string, unknown>)['#text'] as string ?? '')
+          : (item.title as string ?? '')
+        const link = typeof item.link === 'object'
+          ? ((item.link as Record<string, unknown>)['@_href'] as string ?? '')
+          : (item.link as string ?? '')
+        return { title, link, source, pubDate: (item.pubDate ?? item.updated ?? item.published ?? '') as string }
+      })
       .filter(item => item.title && item.link)
   } catch {
     return []
