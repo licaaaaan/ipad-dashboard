@@ -22,7 +22,7 @@ export default function NewsTile() {
     async function load() {
       try {
         const feeds = getFeeds()
-        const params = feeds.map(f => encodeURIComponent(f)).join(',')
+        const params = feeds.map(f => encodeURIComponent(f)).join('|')
         const res = await fetch(`/api/news?feeds=${params}`)
         if (res.ok) {
           const data = await res.json()

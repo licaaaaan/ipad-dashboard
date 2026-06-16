@@ -5,7 +5,7 @@ import { DEFAULT_NEWS_FEEDS } from '@/lib/news-defaults'
 export async function GET(req: NextRequest) {
   const feedsParam = req.nextUrl.searchParams.get('feeds')
   const feeds = feedsParam
-    ? feedsParam.split(',').map(f => decodeURIComponent(f.trim())).filter(Boolean)
+    ? feedsParam.split('|').map(f => decodeURIComponent(f.trim())).filter(Boolean)
     : DEFAULT_NEWS_FEEDS
 
   try {

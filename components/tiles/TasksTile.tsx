@@ -31,13 +31,16 @@ export default function TasksTile() {
           : list
       ),
     }))
-    await fetch('/api/tasks/google', {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ taskListId, taskId }),
-    })
-    setCompleting(prev => { const s = new Set(prev); s.delete(taskId); return s })
-    load()
+    try {
+      await fetch('/api/tasks/google', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ taskListId, taskId }),
+      })
+    } finally {
+      setCompleting(prev => { const s = new Set(prev); s.delete(taskId); return s })
+      load()
+    }
   }
 
   if (!state.connected) {

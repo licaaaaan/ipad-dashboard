@@ -11,9 +11,12 @@ export async function refreshGoogleToken(token: OAuthToken): Promise<OAuthToken>
   auth.setCredentials({ refresh_token: token.refresh_token })
   const { credentials } = await auth.refreshAccessToken()
 
+  const newAccessToken = credentials.access_token
+  if (!newAccessToken) throw new Error('Google token refresh returned no access_token')
+
   return {
-    access_token: credentials.access_token!,
-    refresh_token: token.refresh_token,
+    access_token: newAccessToken,
+    refresh_token: credentials.refresh_token ?? token.refresh_token,
     expires_at: credentials.expiry_date ?? Date.now() + 3600_000,
   }
 }
