@@ -1,10 +1,6 @@
 'use client'
 import { useState } from 'react'
-
-const DEFAULT_NEWS_FEEDS = [
-  'https://feeds.bbci.co.uk/news/rss.xml',
-  'https://feeds.reuters.com/reuters/topNews',
-]
+import { DEFAULT_NEWS_FEEDS } from '@/lib/news-defaults'
 
 function loadNewsFeeds(): string[] {
   try {
@@ -132,7 +128,7 @@ export default function SettingsPanel({
               <h3 className="text-white/70 text-sm font-medium">News Feeds</h3>
               <div className="flex flex-col gap-2">
                 {newsFeeds.map((feed, i) => (
-                  <div key={i} className="flex items-center gap-2">
+                  <div key={feed} className="flex items-center gap-2">
                     <span className="flex-1 text-white/60 text-xs truncate bg-white/5 border border-white/10 rounded-lg px-3 py-2">
                       {feed}
                     </span>

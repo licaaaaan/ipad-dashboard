@@ -2,21 +2,17 @@
 import { useEffect, useState } from 'react'
 import GlassTile from '@/components/ui/GlassTile'
 import type { NewsItem } from '@/types'
-
-const DEFAULT_FEEDS = [
-  'https://feeds.bbci.co.uk/news/rss.xml',
-  'https://feeds.reuters.com/reuters/topNews',
-]
+import { DEFAULT_NEWS_FEEDS } from '@/lib/news-defaults'
 
 function getFeeds(): string[] {
   try {
     const stored = localStorage.getItem('news_feeds')
     if (stored) {
       const parsed = JSON.parse(stored) as string[]
-      return parsed.length > 0 ? parsed : DEFAULT_FEEDS
+      return parsed.length > 0 ? parsed : DEFAULT_NEWS_FEEDS
     }
   } catch {}
-  return DEFAULT_FEEDS
+  return DEFAULT_NEWS_FEEDS
 }
 
 export default function NewsTile() {
@@ -48,9 +44,9 @@ export default function NewsTile() {
         {items.length === 0 && (
           <p className="text-white/40 text-sm self-center">Loading headlines...</p>
         )}
-        {items.map((item, i) => (
+        {items.map((item) => (
           <a
-            key={i}
+            key={item.link}
             href={item.link}
             target="_blank"
             rel="noopener noreferrer"
