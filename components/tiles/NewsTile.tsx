@@ -15,24 +15,37 @@ function getFeeds(): string[] {
   return DEFAULT_NEWS_FEEDS
 }
 
+type Status = 'loading' | 'loaded' | 'error'
+
 export default function NewsTile() {
   const [items, setItems] = useState<NewsItem[]>([])
+  const [status, setStatus] = useState<Status>('loading')
 
   useEffect(() => {
+    let cancelled = false
+
     async function load() {
       try {
         const feeds = getFeeds()
         const params = feeds.map(f => encodeURIComponent(f)).join('|')
         const res = await fetch(`/api/news?feeds=${params}`)
-        if (res.ok) {
-          const data = await res.json()
-          setItems(data.items)
-        }
-      } catch {}
+        if (!res.ok) throw new Error(`news request failed: ${res.status}`)
+        const data = await res.json()
+        if (cancelled) return
+        setItems(data.items ?? [])
+        setStatus('loaded')
+      } catch {
+        if (cancelled) return
+        setStatus('error')
+      }
     }
+
     load()
     const id = setInterval(load, 15 * 60 * 1000)
-    return () => clearInterval(id)
+    return () => {
+      cancelled = true
+      clearInterval(id)
+    }
   }, [])
 
   return (
@@ -41,8 +54,16 @@ export default function NewsTile() {
         News
       </p>
       <div className="flex gap-3 overflow-x-auto no-scrollbar flex-1 items-stretch">
-        {items.length === 0 && (
+        {status === 'loading' && (
           <p className="text-white/40 text-sm self-center">Loading headlines...</p>
+        )}
+        {status === 'error' && (
+          <p className="text-white/40 text-sm self-center">Couldn&apos;t load headlines. Try again later.</p>
+        )}
+        {status === 'loaded' && items.length === 0 && (
+          <p className="text-white/40 text-sm self-center">
+            No headlines — check your feed URLs are valid RSS feeds.
+          </p>
         )}
         {items.map((item) => (
           <a
