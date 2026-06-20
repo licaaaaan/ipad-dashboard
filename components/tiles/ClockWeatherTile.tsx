@@ -84,28 +84,30 @@ export default function ClockWeatherTile({ locationOverride }: { locationOverrid
 
   return (
     <GlassTile gradient="from-sky-200 to-indigo-200" className="h-full flex flex-col justify-between">
-      {/* Time + Date */}
-      <div className="flex flex-col gap-2">
-        <div className="flex items-center justify-between">
-          <span className="text-5xl font-light text-white tabular-nums tracking-tight">
+      {/* Clock — hero, owns its own row so the temperature can't crowd it */}
+      <div className="flex flex-col gap-5">
+        <div className="flex flex-col gap-1">
+          <span className="text-6xl font-light text-white tabular-nums tracking-tight leading-none">
             {now ? formatTime(now) : '--:--'}
           </span>
-          {weather && (
-            <div className="flex items-center gap-2">
-              <span className="text-4xl" role="img" aria-label={weather.condition}>{weather.icon}</span>
-              <span className="text-white text-4xl font-light">{weather.temp}°</span>
-            </div>
-          )}
+          <p className="text-sky-100/70 text-base font-medium">
+            {now ? formatDate(now) : ' '}
+          </p>
         </div>
 
-        <p className="text-sky-100/70 text-base font-medium">
-          {now ? formatDate(now) : ''}
-        </p>
-
+        {/* Current conditions */}
         {weather && (
-          <div className="flex flex-col gap-0.5">
-            <p className="text-indigo-100/70 text-sm capitalize">{weather.condition}</p>
-            <p className="text-indigo-100/90 text-sm font-medium">📍 {weather.city}</p>
+          <div className="flex flex-col gap-1">
+            <div className="flex items-center gap-3">
+              <span className="text-5xl leading-none shrink-0" role="img" aria-label={weather.condition}>
+                {weather.icon}
+              </span>
+              <span className="text-white text-5xl font-light leading-none tabular-nums">
+                {weather.temp}°
+              </span>
+            </div>
+            <p className="text-indigo-50/80 text-sm capitalize leading-tight">{weather.condition}</p>
+            <p className="text-indigo-100/90 text-sm font-medium leading-tight truncate">📍 {weather.city}</p>
           </div>
         )}
 
@@ -126,12 +128,12 @@ export default function ClockWeatherTile({ locationOverride }: { locationOverrid
 
       {/* Forecast */}
       {weather && (
-        <div className="flex gap-4">
+        <div className="flex justify-between border-t border-white/10 pt-4">
           {weather.forecast.map((day) => (
-            <div key={day.date} className="flex flex-col items-center gap-0.5">
-              <span className="text-indigo-200/60 text-xs">{day.date}</span>
+            <div key={day.date} className="flex flex-col items-center gap-1">
+              <span className="text-indigo-200/60 text-xs font-medium">{day.date}</span>
               <span className="text-2xl" role="img" aria-label="">{day.icon}</span>
-              <span className="text-white text-sm">{day.high}°</span>
+              <span className="text-white text-sm font-medium">{day.high}°</span>
               <span className="text-indigo-200/50 text-xs">{day.low}°</span>
             </div>
           ))}
