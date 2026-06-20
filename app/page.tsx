@@ -16,8 +16,8 @@ export default function DashboardPage() {
       <main
         className="aurora-bg w-screen h-screen p-4 grid gap-3"
         style={{
-          gridTemplateColumns: '0.85fr 1.8fr 1fr',
-          gridTemplateRows: '1fr 1fr 0.42fr',
+          gridTemplateColumns: '0.85fr 1.6fr 1.2fr',
+          gridTemplateRows: '1fr 1fr 0.5fr',
         }}
       >
         {/* col 1 row 1 — Clock & Weather (compact) */}

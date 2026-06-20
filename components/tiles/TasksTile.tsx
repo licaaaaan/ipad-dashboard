@@ -65,7 +65,14 @@ export default function TasksTile() {
       <p className="text-purple-200/70 text-xs font-semibold tracking-widest uppercase mb-2">Tasks</p>
       <div className="flex-1 min-h-0 overflow-y-auto no-scrollbar flex flex-col gap-3">
         {state.taskLists.length === 0 && (
-          <p className="text-white/40 text-sm mt-4 text-center">No pending tasks</p>
+          <div className="flex flex-col items-center justify-center flex-1 gap-2 mt-4">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"
+              className="w-10 h-10 text-white/20" aria-hidden="true">
+              <circle cx="12" cy="12" r="9" />
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4" />
+            </svg>
+            <p className="text-white/30 text-sm">All clear</p>
+          </div>
         )}
         {state.taskLists.map(list => (
           <div key={list.id}>

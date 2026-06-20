@@ -28,7 +28,10 @@ export default function PhotoTile() {
       ) : (
         <div className="absolute inset-0 animate-pulse bg-amber-800/20" />
       )}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20" />
+      <p className="absolute top-3 left-3 text-white/50 text-xs font-semibold tracking-widest uppercase z-10">
+        Photo
+      </p>
       {photo?.title && (
         <p className="absolute bottom-2 left-3 right-3 text-white/75 text-xs leading-snug line-clamp-2">
           {photo.title}

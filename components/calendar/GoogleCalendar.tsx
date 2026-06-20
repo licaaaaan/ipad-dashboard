@@ -64,18 +64,19 @@ export default function GoogleCalendar() {
 
   if (groups.length === 0) {
     return (
-      <div className="flex flex-col h-full gap-1">
-        <p className="text-cyan-200/60 text-lg font-semibold tracking-widest uppercase mb-1">This Week</p>
-        <div className="flex items-center justify-center flex-1">
-          <p className="text-white/40 text-xl">No events this week</p>
-        </div>
+      <div className="flex flex-col items-center justify-center h-full gap-2">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"
+          className="w-10 h-10 text-white/20" aria-hidden="true">
+          <rect x="3" y="4" width="18" height="18" rx="2" />
+          <path strokeLinecap="round" d="M16 2v4M8 2v4M3 10h18" />
+        </svg>
+        <p className="text-white/30 text-sm">No events this week</p>
       </div>
     )
   }
 
   return (
     <div className="flex flex-col gap-3 h-full overflow-y-auto no-scrollbar">
-      <p className="text-cyan-200/60 text-lg font-semibold tracking-widest uppercase shrink-0">This Week</p>
       {groups.map(group => (
         <div key={group.key} className="shrink-0">
           <p className="text-cyan-300/80 text-lg font-semibold mb-1.5">{group.label}</p>

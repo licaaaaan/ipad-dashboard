@@ -43,7 +43,8 @@ function CtrlBtn({ onClick, children, large = false }: {
       onClick={onClick}
       className={`
         ${large ? 'w-24 h-24' : 'w-16 h-16'}
-        rounded-full bg-white/10 hover:bg-white/20 active:bg-white/30 active:scale-90
+        shrink-0 aspect-square rounded-full
+        bg-white/10 hover:bg-white/20 active:bg-white/30 active:scale-90
         flex items-center justify-center text-white transition-all duration-100 select-none
       `}
     >
@@ -167,7 +168,7 @@ export default function SpotifyPlayer() {
       <div className="flex flex-col items-center justify-center h-full gap-4">
         <p className="text-white/50 text-xl text-center">Spotify not connected</p>
         <a href="/api/auth/spotify"
-          className="px-6 py-3 bg-pink-400 hover:bg-pink-300 text-white text-lg font-semibold rounded-full transition-colors">
+          className="px-6 py-3 bg-rose-400 hover:bg-rose-300 text-white text-lg font-semibold rounded-full transition-colors">
           Connect Spotify
         </a>
       </div>
@@ -178,14 +179,16 @@ export default function SpotifyPlayer() {
 
   return (
     <div className="flex flex-col h-full gap-3">
-      {/* Album art — fills full tile width */}
+      {/* Album art */}
       <div className="shrink-0 w-full">
         {np?.albumArtUrl ? (
           <img src={np.albumArtUrl} alt={np.albumName}
             className="w-full aspect-square rounded-2xl shadow-2xl object-cover" />
         ) : (
           <div className="w-full aspect-square rounded-2xl bg-white/5 flex items-center justify-center">
-            <span className="text-6xl">🎵</span>
+            <svg viewBox="0 0 24 24" fill="currentColor" className="w-16 h-16 text-white/20" aria-hidden="true">
+              <path d="M9 3v11.5a3.5 3.5 0 1 0 2 3.12V8h5V3H9zm0 14.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z" />
+            </svg>
           </div>
         )}
       </div>
@@ -204,7 +207,7 @@ export default function SpotifyPlayer() {
 
       {/* Progress bar */}
       <div className="shrink-0 w-full h-2 bg-white/20 rounded-full overflow-hidden">
-        <div className="h-full bg-pink-300 rounded-full transition-all duration-1000"
+        <div className="h-full bg-rose-300 rounded-full transition-all duration-1000"
           style={{ width: `${progress}%` }} />
       </div>
 
